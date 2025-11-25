@@ -38,7 +38,7 @@ resource "aws_secretsmanager_secret_version" "db_credentials" {
 resource "aws_db_instance" "main" {
   count                      = var.create_rds
   identifier                 = "${local.name_prefix}-db"
-  engine                     = "postgres"
+  engine                     = var.engine
   engine_version             = var.engine_version
   instance_class             = var.db_instance_class
   allocated_storage          = var.allocated_storage

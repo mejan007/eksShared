@@ -73,7 +73,7 @@ variable "rds_allocated_storage" {
 }
 
 variable "rds_engine_version" {
-  description = "The engine version for the PostgreSQL RDS database"
+  description = "The engine version for the MySQL RDS database"
   type        = string
-  default     = "17.2"
+  default     = "8.0.43"
 }
