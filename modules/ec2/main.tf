@@ -49,7 +49,10 @@ resource "aws_iam_role_policy" "eks_access_policy" {
         Action = [
           "eks:DescribeCluster",
           "eks:ListClusters",
-          "eks:AccessKubernetesApi"
+          "eks:AccessKubernetesApi",
+          "eks:DescribeClusterVersions",
+          "cloudformation:ListStacks",
+          "eks:ListNodegroups"
         ]
         Resource = "*"
       }
