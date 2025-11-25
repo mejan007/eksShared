@@ -1,14 +1,14 @@
-resource "aws_eks_cluster" "main" {
+resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster.arn
 
   # Specify VPC subnets where EKS will create its ENIs
   vpc_config {
-    public_access_cidrs = var.public_access_cidrs
+    # public_access_cidrs = var.public_access_cidrs
 
     subnet_ids = var.subnet_ids
     # Set to true to allow public access to the Kube API endpoint
-    endpoint_public_access = true 
+    endpoint_public_access = false 
     # Set to true to allow private access from within the VPC
     endpoint_private_access = true
   }
@@ -63,7 +63,7 @@ resource "aws_eks_cluster" "main" {
 
 
 resource "aws_eks_node_group" "node_group" {
-  cluster_name    = aws_eks_cluster.main.name
+  cluster_name    = aws_eks_cluster.eks_cluster.name
   node_group_name = "${var.cluster_name}-node-group"
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = var.subnet_ids
@@ -94,7 +94,7 @@ resource "aws_eks_node_group" "node_group" {
 }
 
 data "aws_eks_cluster" "eks" {
-  name = aws_eks_cluster.main.name
+  name = aws_eks_cluster.eks_cluster.name
 }
 
 data "tls_certificate" "oidc" {

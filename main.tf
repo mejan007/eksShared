@@ -39,3 +39,10 @@ resource "aws_security_group_rule" "eks_to_rds_prod" {
   source_security_group_id = module.eks_prod[0].eks_service_sg_id
   description              = "Allow inbound PostgreSQL from the EKS service"
 }
+
+module "eks" {
+  source = "./modules/eks"
+  cluster_name = "ase-eks-cluster"
+  subnet_ids = values(module.vpc["prod"].private_subnet_ids_by_az)
+  aws_region = var.aws_region
+}
