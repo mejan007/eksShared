@@ -13,7 +13,7 @@ resource "aws_instance" "ec2_instance" {
     volume_size = var.root_volume_size
     volume_type = var.root_volume_type
   }
-  
+
 
   tags = var.tags
 }

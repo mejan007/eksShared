@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region for the infrastructure"
   type        = string
-  default     = "us-west-1"
+  default     = "us-east-1"
 }
 
 variable "project_name" {
@@ -20,7 +20,7 @@ variable "vpc_cidr" {
 variable "availability_zones" {
   description = "List of Availability Zones"
   type        = list(string)
-  default     = ["us-west-1a", "us-west-1c"]
+  default     = ["us-east-1a", "us-east-1c"]
 }
 
 variable "public_subnet_cidrs" {
@@ -82,15 +82,17 @@ variable "rds_engine_version" {
 variable "instance_type" {
   description = "The instance type for the main application EC2 instance."
   type        = string
-  default     = "t3a.small"
+  default     = "t3.micro"
 }
 
 variable "ami_id" {
   description = "The AMI ID for the main application EC2 instance."
   type        = string
+  default     = "ami-0fa3fe0fa7920f68e"
 }
 
 variable "key_name" {
   description = "The name of the SSH key pair for the application instance."
   type        = string
+  default     = "eks-key"
 }

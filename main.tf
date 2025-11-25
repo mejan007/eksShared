@@ -9,12 +9,12 @@ module "vpc" {
   enable_nat_gateway   = true
 }
 
-module "eks" {
-  source       = "./modules/eks"
-  cluster_name = "ase-eks-cluster"
-  subnet_ids   = values(module.vpc.private_subnet_ids)
-  aws_region   = var.aws_region
-}
+# module "eks" {
+#   source       = "./modules/eks"
+#   cluster_name = "ase-eks-cluster"
+#   subnet_ids   = values(module.vpc.private_subnet_ids)
+#   aws_region   = var.aws_region
+# }
 
 # RDS module for production
 module "rds_mysql" {
@@ -26,38 +26,57 @@ module "rds_mysql" {
   environment       = "prod"
   vpc_id            = module.vpc.vpc_id
   subnet_ids        = values(module.vpc.private_subnet_ids)
-  security_group_id = aws_security_group.rds_sg_prod[0].id
+  security_group_id = aws_security_group.eks_to_rds_prod[0].id
   db_name           = var.rds_database_name
   db_instance_class = var.rds_instance_class
   allocated_storage = var.rds_allocated_storage
   engine_version    = var.rds_engine_version
+
+  depends_on = [ module.eks ]
 }
 
-# Security Group Rule: Allow EKS to connect to RDS.
-resource "aws_security_group_rule" "eks_to_rds_prod" {
-  count                    = var.create_rds
-  type                     = "ingress"
-  from_port                = 3306
-  to_port                  = 3306
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.rds_sg_prod[0].id
-  source_security_group_id = module.eks.cluster_security_group_id
-  description              = "Allow inbound MySQL from the EKS service"
+# Security Group: Allow EKS to connect to RDS
+resource "aws_security_group" "eks_to_rds_prod" {
+  count       = var.create_rds
+  name        = "eks-to-rds-prod-${count.index}"
+  description = "Allow EKS cluster to connect to RDS MySQL"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    description                = "Allow inbound MySQL from the EKS service"
+    from_port                  = 3306
+    to_port                    = 3306
+    protocol                   = "tcp"
+    security_groups            = [module.eks.cluster_security_group_id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "eks-to-rds-prod-${count.index}"
+  }
+
+  depends_on = [module.eks]
 }
 
 module "eks" {
-  source = "./modules/eks"
+  source       = "./modules/eks"
   cluster_name = "ase-eks-cluster"
-  subnet_ids = values(module.vpc.private_subnet_ids)
-  aws_region = var.aws_region
+  subnet_ids   = values(module.vpc.private_subnet_ids)
+  aws_region   = var.aws_region
 }
 
 module "ec2" {
   source                      = "./modules/ec2"
   root_volume_size            = 25
-  ami_id                      =  var.ami_id
+  ami_id                      = var.ami_id
   instance_type               = var.instance_type
-  subnet_id                   = module.vpc.public_subnet_ids[0]
+  subnet_id                   = values(module.vpc.public_subnet_ids)[0]
   key_name                    = var.key_name
   vpc_id                      = module.vpc.vpc_id
   associate_public_ip_address = true
@@ -81,8 +100,8 @@ module "ec2" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = ["${chomp(data.http.my_ip.response_body)}/32"] 
+      cidr_blocks = ["0.0.0.0/0"]
     }
   ]
-  
+
 }
