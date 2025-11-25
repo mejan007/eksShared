@@ -77,3 +77,20 @@ variable "rds_engine_version" {
   type        = string
   default     = "8.0.43"
 }
+
+# --- Ec2 Variables ---
+variable "instance_type" {
+  description = "The instance type for the main application EC2 instance."
+  type        = string
+  default     = "t3a.small"
+}
+
+variable "ami_id" {
+  description = "The AMI ID for the main application EC2 instance."
+  type        = string
+}
+
+variable "key_name" {
+  description = "The name of the SSH key pair for the application instance."
+  type        = string
+}

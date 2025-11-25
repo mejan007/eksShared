@@ -45,4 +45,44 @@ resource "aws_security_group_rule" "eks_to_rds_prod" {
   description              = "Allow inbound MySQL from the EKS service"
 }
 
+module "eks" {
+  source = "./modules/eks"
+  cluster_name = "ase-eks-cluster"
+  subnet_ids = values(module.vpc.private_subnet_ids)
+  aws_region = var.aws_region
+}
 
+module "ec2" {
+  source                      = "./modules/ec2"
+  root_volume_size            = 25
+  ami_id                      =  var.ami_id
+  instance_type               = var.instance_type
+  subnet_id                   = module.vpc.public_subnet_ids[0]
+  key_name                    = var.key_name
+  vpc_id                      = module.vpc.vpc_id
+  associate_public_ip_address = true
+  sg_ingress_rules = [
+    {
+      description = "Allow HTTPS"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      description = "Allow HTTP"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      description = "Allow SSH"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["${chomp(data.http.my_ip.response_body)}/32"] 
+    }
+  ]
+  
+}
