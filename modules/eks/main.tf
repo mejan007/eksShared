@@ -92,3 +92,17 @@ resource "aws_eks_node_group" "node_group" {
     aws_iam_role_policy_attachment.node_group-AmazonEC2ContainerRegistryReadOnly,
   ]
 }
+
+data "aws_eks_cluster" "eks" {
+  name = aws_eks_cluster.main.name
+}
+
+data "tls_certificate" "oidc" {
+  url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks_oidc" {
+  client_id_list = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.oidc.certificates[0].sha1_fingerprint]
+  url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
+}

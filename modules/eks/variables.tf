@@ -84,3 +84,9 @@ variable "bootstrap_cluster_creator_admin_permissions" {
   type = bool
   default = false
 }
+
+variable "project_name" {
+  type = string 
+  default = "eks-training"
+  
+}
