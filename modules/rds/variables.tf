@@ -52,7 +52,7 @@ variable "allocated_storage" {
 variable "engine" {
   description = "The database engine to use"
   type        = string
-  
+
 }
 variable "engine_version" {
   description = "The PostgreSQL engine version"

@@ -27,10 +27,10 @@ output "availability_zones" {
 # --- RDS Outputs ---
 output "rds_instance_endpoint" {
   description = "The endpoint of the RDS instance"
-  value       = var.create_rds > 0 ? module.rds_postgres[0].db_instance_endpoint : "RDS not deployed"
+  value       = var.create_rds > 0 ? module.rds_mysql[0].db_instance_endpoint : "RDS not deployed"
 }
 
 output "database_secret_arn" {
   description = "ARN of the Secrets Manager secret for the database"
-  value       = var.create_rds > 0 ? module.rds_postgres[0].db_secret_arn : "RDS not deployed"
+  value       = var.create_rds > 0 ? module.rds_mysql[0].db_secret_arn : "RDS not deployed"
 }

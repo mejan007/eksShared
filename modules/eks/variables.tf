@@ -21,18 +21,18 @@ variable "instance_types" {
 variable "disk_size" {
   description = "Disk size (in GiB) for the EKS worker nodes."
   type        = number
-  default     = 20  
+  default     = 20
 }
 variable "capacity_type" {
   description = "Capacity type for the EKS worker nodes (e.g., ON_DEMAND, SPOT)."
   type        = string
-  default     = "ON_DEMAND"  
+  default     = "ON_DEMAND"
 }
 
 variable "public_access_cidrs" {
   description = "List of CIDR blocks that are allowed access to the public Kubernetes API server endpoint."
   type        = list(string)
-  default     = ""
+  default     = []
 }
 
 variable "enable_elastic_load_balancing" {
@@ -66,27 +66,27 @@ variable "enable_encryption_config" {
 }
 
 variable "encryption_key_arn" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "enable_access_config" {
-  type = bool
+  type    = bool
   default = false
 }
 
 variable "authentication_mode" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "bootstrap_cluster_creator_admin_permissions" {
-  type = bool
+  type    = bool
   default = false
 }
 
 variable "project_name" {
-  type = string 
+  type    = string
   default = "eks-training"
-  
+
 }

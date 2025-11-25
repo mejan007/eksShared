@@ -80,34 +80,34 @@ resource "aws_route" "private_nat_gw" {
   nat_gateway_id         = aws_nat_gateway.nat[each.key].id
 }
 
-resource "aws_route" "private_nat_instance" {
-  for_each               = var.enable_nat_instance && var.nat_instance_ami != "" ? aws_route_table.private : {}
-  route_table_id         = each.value.id
-  destination_cidr_block = "0.0.0.0/0"
-  network_interface_id   = module.nat_instance[each.key].network_interface_id
-}
+# resource "aws_route" "private_nat_instance" {
+#   for_each               = var.enable_nat_instance && var.nat_instance_ami != "" ? aws_route_table.private : {}
+#   route_table_id         = each.value.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   network_interface_id   = module.nat_instance[each.key].network_interface_id
+# }
 
-module "nat_instance" {
-  for_each = var.enable_nat_instance && var.nat_instance_ami != "" ? aws_subnet.public : {}
-  source   = "../ec2"
+# module "nat_instance" {
+#   for_each = var.enable_nat_instance && var.nat_instance_ami != "" ? aws_subnet.public : {}
+#   source   = "../ec2"
 
-  ami                 = var.nat_instance_ami
-  instance_type       = "t2.micro"
-  vpc_id              = aws_vpc.main.id
-  subnet_id           = each.value.id
-  private_cidrs       = [for s in values(aws_subnet.private) : s.cidr_block if s.availability_zone == each.key]
-  is_test_instance    = false
-  is_public           = true
-  source_dest_check   = false
-  associate_public_ip = true
-  create_eip          = true
-  # user_data          = <<-EOF
-  #   #!/bin/bash
-  #   sysctl -w net.ipv4.ip_forward=1
-  #   echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-  #   EOF
-  tags        = merge(var.common_tags, { Name = "${var.name_prefix}nat-instance-${each.key}" })
-  common_tags = var.common_tags
-  name_prefix = var.name_prefix
-  depends_on  = [aws_internet_gateway.igw]
-}
+#   ami                 = var.nat_instance_ami
+#   instance_type       = "t2.micro"
+#   vpc_id              = aws_vpc.main.id
+#   subnet_id           = each.value.id
+#   private_cidrs       = [for s in values(aws_subnet.private) : s.cidr_block if s.availability_zone == each.key]
+#   is_test_instance    = false
+#   is_public           = true
+#   source_dest_check   = false
+#   associate_public_ip = true
+#   create_eip          = true
+#   # user_data          = <<-EOF
+#   #   #!/bin/bash
+#   #   sysctl -w net.ipv4.ip_forward=1
+#   #   echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+#   #   EOF
+#   tags        = merge(var.common_tags, { Name = "${var.name_prefix}nat-instance-${each.key}" })
+#   common_tags = var.common_tags
+#   name_prefix = var.name_prefix
+#   depends_on  = [aws_internet_gateway.igw]
+# }

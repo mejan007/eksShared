@@ -1,6 +1,6 @@
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
-  role_arn = aws_iam_role.eks_cluster.arn
+  role_arn = aws_iam_role.cluster.arn
 
   # Specify VPC subnets where EKS will create its ENIs
   vpc_config {
@@ -8,7 +8,7 @@ resource "aws_eks_cluster" "eks_cluster" {
 
     subnet_ids = var.subnet_ids
     # Set to true to allow public access to the Kube API endpoint
-    endpoint_public_access = false 
+    endpoint_public_access = false
     # Set to true to allow private access from within the VPC
     endpoint_private_access = true
   }
@@ -20,7 +20,7 @@ resource "aws_eks_cluster" "eks_cluster" {
       service_ipv4_cidr = var.service_ipv4_cidr
 
       ip_family = var.ip_family
-    
+
       dynamic "elastic_load_balancing" {
         for_each = var.enable_elastic_load_balancing ? [1] : []
         content {
@@ -44,12 +44,12 @@ resource "aws_eks_cluster" "eks_cluster" {
   dynamic "access_config" {
     for_each = var.enable_access_config ? [1] : []
     content {
-      authentication_mode = var.authentication_mode
+      authentication_mode                         = var.authentication_mode
       bootstrap_cluster_creator_admin_permissions = var.bootstrap_cluster_creator_admin_permissions
     }
   }
 
-  
+
 
   tags = {
     Name = var.cluster_name
@@ -67,10 +67,10 @@ resource "aws_eks_node_group" "node_group" {
   node_group_name = "${var.cluster_name}-node-group"
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = var.subnet_ids
-  region = var.aws_region
-  instance_types = var.instance_types
-  disk_size = var.disk_size
-  capacity_type = var.capacity_type
+  # region          = var.aws_region
+  instance_types  = var.instance_types
+  disk_size       = var.disk_size
+  capacity_type   = var.capacity_type
   scaling_config {
     desired_size = 2
     max_size     = 2
@@ -102,8 +102,10 @@ data "tls_certificate" "oidc" {
 }
 
 resource "aws_iam_openid_connect_provider" "eks_oidc" {
-  client_id_list = ["sts.amazonaws.com"]
+  client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.oidc.certificates[0].sha1_fingerprint]
-  url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer 
-  
+  url             = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
+
+  depends_on = [aws_eks_cluster.eks_cluster]
 }
+
