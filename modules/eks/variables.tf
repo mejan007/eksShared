@@ -7,6 +7,27 @@ variable "subnet_ids" {
   description = "List of VPC Subnet IDs (typically private) for the worker nodes and EKS ENIs."
   type        = list(string)
 }
+variable "aws_region" {
+  description = "AWS region for the EKS cluster."
+  type        = string
+}
+
+variable "instance_types" {
+  description = "List of instance types for the EKS worker nodes."
+  type        = list(string)
+  default     = ["t3.medium"]
+}
+
+variable "disk_size" {
+  description = "Disk size (in GiB) for the EKS worker nodes."
+  type        = number
+  default     = 20  
+}
+variable "capacity_type" {
+  description = "Capacity type for the EKS worker nodes (e.g., ON_DEMAND, SPOT)."
+  type        = string
+  default     = "ON_DEMAND"  
+}
 
 variable "public_access_cidrs" {
   description = "List of CIDR blocks that are allowed access to the public Kubernetes API server endpoint."
