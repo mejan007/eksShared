@@ -7,3 +7,59 @@ variable "subnet_ids" {
   description = "List of VPC Subnet IDs (typically private) for the worker nodes and EKS ENIs."
   type        = list(string)
 }
+
+variable "public_access_cidrs" {
+  description = "List of CIDR blocks that are allowed access to the public Kubernetes API server endpoint."
+  type        = list(string)
+  default     = ""
+}
+
+variable "enable_elastic_load_balancing" {
+  description = "Boolean to enable or disable elastic load balancing in the EKS cluster."
+  type        = bool
+  default     = false
+}
+
+variable "service_ipv4_cidr" {
+  description = "The CIDR block to assign Kubernetes service IPs."
+  type        = string
+  default     = ""
+}
+
+variable "ip_family" {
+  description = "The IP family used for pod and service IPs."
+  type        = string
+  default     = "ipv4"
+}
+
+variable "enable_kubernetes_network_config" {
+  description = "Boolean to enable or disable kubernetes network config in the EKS cluster."
+  type        = bool
+  default     = false
+}
+
+variable "enable_encryption_config" {
+  description = "Boolean to enable or disable encryption config in the EKS cluster."
+  type        = bool
+  default     = false
+}
+
+variable "encryption_key_arn" {
+  type = string
+  default = ""
+}
+
+variable "enable_access_config" {
+  type = bool
+  default = false
+}
+
+variable "authentication_mode" {
+  type = string
+  default = ""
+}
+
+variable "bootstrap_cluster_creator_admin_permissions" {
+  type = bool
+  default = false
+}

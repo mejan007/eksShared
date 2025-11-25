@@ -13,12 +13,43 @@ resource "aws_eks_cluster" "main" {
     endpoint_private_access = true
   }
 
-  kubernetes_network_config {
+  dynamic "kubernetes_network_config" {
+    for_each = var.enable_kubernetes_network_config ? [1] : []
 
-    elastic_load_balancing {
-      enabled = var.
+    content {
+      service_ipv4_cidr = var.service_ipv4_cidr
+
+      ip_family = var.ip_family
+    
+      dynamic "elastic_load_balancing" {
+        for_each = var.enable_elastic_load_balancing ? [1] : []
+        content {
+          enabled = true
+        }
+      }
     }
   }
+
+  dynamic "encryption_config" {
+    for_each = var.enable_encryption_config ? [1] : []
+
+    content {
+      provider {
+        key_arn = var.encryption_key_arn
+      }
+      resources = ["secrets"]
+    }
+  }
+
+  dynamic "access_config" {
+    for_each = var.enable_access_config ? [1] : []
+    content {
+      authentication_mode = var.authentication_mode
+      bootstrap_cluster_creator_admin_permissions = var.bootstrap_cluster_creator_admin_permissions
+    }
+  }
+
+  
 
   tags = {
     Name = var.cluster_name
