@@ -72,7 +72,7 @@ variable "encryption_key_arn" {
 
 variable "enable_access_config" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "authentication_mode" {
@@ -82,7 +82,7 @@ variable "authentication_mode" {
 
 variable "bootstrap_cluster_creator_admin_permissions" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "project_name" {

@@ -120,12 +120,12 @@ resource "aws_eks_access_entry" "eks_access_entry" {
 
 
 resource "aws_eks_access_policy_association" "eks_access_policy_association" {
-  cluster_name  = aws_eks_cluster.example.name
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSFullAccess"
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
   principal_arn = aws_eks_access_entry.eks_access_entry.principal_arn
 
   access_scope {
-    type       = "Cluster"
+    type       = "cluster"
    
   }
 }
