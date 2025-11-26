@@ -53,7 +53,14 @@ resource "aws_iam_role_policy" "eks_access_policy" {
           "eks:DescribeClusterVersions",
           "cloudformation:ListStacks",
           "eks:ListNodegroups",
-          "eks:DescribeNodegroup"
+          "eks:DescribeNodegroup",
+          "iam:GetOpenIDConnectProvider",
+          "cloudformation:CreateStack",
+          "cloudformation:DescribeStacks",
+          "cloudformation:UpdateTerminationProtection",
+          "cloudformation:DeleteStack",
+          "cloudformation:UpdateStack"
+
         ]
         Resource = "*"
       }
