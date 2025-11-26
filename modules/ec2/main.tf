@@ -59,7 +59,17 @@ resource "aws_iam_role_policy" "eks_access_policy" {
           "cloudformation:DescribeStacks",
           "cloudformation:UpdateTerminationProtection",
           "cloudformation:DeleteStack",
-          "cloudformation:UpdateStack"
+          "cloudformation:UpdateStack",
+          "iam:CreateRole",
+          "iam:AttachRolePolicy",
+          "iam:PutRolePolicy",
+          "iam:DeleteRole",
+          "iam:DetachRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:ListRoles",
+          "iam:GetRole",
+          "iam:TagRole",
+          "ec2imds: GetMetadata",
 
         ]
         Resource = "*"
