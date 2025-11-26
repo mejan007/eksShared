@@ -90,3 +90,9 @@ variable "project_name" {
   default = "eks-training"
 
 }
+
+variable "ec2_role_for_eks" {
+  type = string 
+  description = "ec2 role for the eks access identity"
+  
+}

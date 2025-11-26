@@ -52,7 +52,8 @@ resource "aws_iam_role_policy" "eks_access_policy" {
           "eks:AccessKubernetesApi",
           "eks:DescribeClusterVersions",
           "cloudformation:ListStacks",
-          "eks:ListNodegroups"
+          "eks:ListNodegroups",
+          "eks:DescribeNodegroup"
         ]
         Resource = "*"
       }

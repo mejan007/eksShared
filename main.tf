@@ -69,6 +69,7 @@ module "eks" {
   cluster_name = "ase-eks-cluster"
   subnet_ids   = values(module.vpc.private_subnet_ids)
   aws_region   = var.aws_region
+  ec2_role_for_eks = module.ec2.ec2_role_arn
 }
 
 module "ec2" {

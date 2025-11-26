@@ -22,3 +22,9 @@ output "created_security_group_id" {
   description = "The ID of the security group created by this module (if any)."
   value       = var.create_security_group ? aws_security_group.ec2_sg[0].id : null
 }
+
+output "ec2_role_arn" {
+  value = aws_iam_role.runner_role.arn 
+  description = "The Self Hosted EC2 Runner Role"
+  
+}
