@@ -116,5 +116,5 @@ resource "aws_security_group_rule" "bastion_to_eks_controlplane" {
   protocol                 = "tcp"
 
   security_group_id        = module.eks.cluster_security_group_id
-  source_security_group_id = module.ec2.created_security_group_id
-}
+  cidr_blocks              = ["10.0.0.0/16"]
+  }
