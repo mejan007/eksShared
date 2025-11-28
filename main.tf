@@ -70,7 +70,8 @@ module "eks" {
   subnet_ids   = values(module.vpc.private_subnet_ids)
   aws_region   = var.aws_region
   ec2_role_for_eks = module.ec2.ec2_role_arn
-  authentication_mode = "API_AND_CONFIG_MAP"
+  authentication_mode = "API_AND_CONFIG_MAP" 
+
 }
 
 module "ec2" {

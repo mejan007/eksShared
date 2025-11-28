@@ -112,17 +112,25 @@ resource "aws_iam_role_policy_attachment" "alb_controller_attach" {
 ### EKS Acess Entries ( Instead of aws-auth ConfigMap)
 
 resource "aws_eks_access_entry" "eks_access_entry" {
+  for_each = toset(var.ec2_roles_for_eks)
   cluster_name      = aws_eks_cluster.eks_cluster.name
-  principal_arn     = var.ec2_role_for_eks
+  principal_arn = each.value
  
   type              = "STANDARD"
 }
 
 
 resource "aws_eks_access_policy_association" "eks_access_policy_association" {
+
+  for_each = toset(var.ec2_roles_for_eks)
+
   cluster_name  = aws_eks_cluster.eks_cluster.name
+  principal_arn = each.value
+
+
+  
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn = aws_eks_access_entry.eks_access_entry.principal_arn
+  # principal_arn = aws_eks_access_entry.eks_access_entry.principal_arn
 
   access_scope {
     type       = "cluster"
