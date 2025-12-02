@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+  
+
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
   role_arn = aws_iam_role.cluster.arn
@@ -12,7 +15,7 @@ resource "aws_eks_cluster" "eks_cluster" {
     # Set to true to allow private access from within the VPC
     endpoint_private_access = true
   }
-  bootstrap_self_managed_addons = false
+  bootstrap_self_managed_addons = true
   
   dynamic "kubernetes_network_config" {
     for_each = var.enable_kubernetes_network_config ? [1] : []
@@ -61,22 +64,22 @@ resource "aws_eks_cluster" "eks_cluster" {
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
 }
 
-resource "aws_eks_addon" "core_dns" {
-  cluster_name = aws_eks_cluster.eks_cluster.name
-  addon_version = "v1.12.3-eksbuild.1"
-  addon_name   = "core-dns"
-}
-resource "aws_eks_addon" "metrics_server" {
-  cluster_name = aws_eks_cluster.eks_cluster.name
-  addon_version = "v0.8.0-eksbuild.5"
-  addon_name   = "metrics-server"
-}
-resource "aws_eks_addon" "kube_proxy" {
-  cluster_name = aws_eks_cluster.eks_cluster.name
-  addon_version = "v1.34.1-eksbuild.2"
-  addon_name   = "kube-proxy"
+# resource "aws_eks_addon" "core_dns" {
+#   cluster_name = aws_eks_cluster.eks_cluster.name
+#   addon_version = "v1.12.3-eksbuild.1"
+#   addon_name   = "core-dns"
+# }
+# resource "aws_eks_addon" "metrics_server" {
+#   cluster_name = aws_eks_cluster.eks_cluster.name
+#   addon_version = "v0.8.0-eksbuild.5"
+#   addon_name   = "metrics-server"
+# }
+# resource "aws_eks_addon" "kube_proxy" {
+#   cluster_name = aws_eks_cluster.eks_cluster.name
+#   addon_version = "v1.34.1-eksbuild.2"
+#   addon_name   = "kube-proxy"
   
-}
+# }
 
 resource "aws_kms_key" "eks_launch_template_cmk" {
   description             = "KMS key for EKS Launch Template EBS volume encryption"
@@ -99,7 +102,7 @@ resource "aws_kms_key" "eks_launch_template_cmk" {
         Sid    = "Allow administration of the key"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/*"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
         Action = [
           "kms:ReplicateKey",
@@ -122,7 +125,7 @@ resource "aws_kms_key" "eks_launch_template_cmk" {
         Sid    = "Allow use of the key"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/*"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
         Action = [
           "kms:DescribeKey",
@@ -172,36 +175,28 @@ resource "aws_launch_template" "eks_launch_template" {
     capacity_reservation_preference = var.capacity_reservation_preference
   }
 
-  cpu_options {
-    core_count       = var.cpu_core_count
-    threads_per_core = var.cpu_threads_per_core
-  }
+  # cpu_options {
+  #   core_count       = var.cpu_core_count
+  #   threads_per_core = var.cpu_threads_per_core
+  # }
 
   credit_specification {
     cpu_credits = var.credit_specification_cpu_credits
   }
 
-  disable_api_stop        = var.disable_api_stop
-  disable_api_termination = var.disable_api_termination
+  # disable_api_stop        = var.disable_api_stop
+  # disable_api_termination = var.disable_api_termination
 
   ebs_optimized = var.ebs_optimized
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.node_group.name
-  }
-
   image_id = var.ami_id
 
-  instance_initiated_shutdown_behavior = var.instance_initiated_shutdown_behavior
-
-  instance_market_options {
-    market_type = var.instance_market_type
-  }
+  # instance_initiated_shutdown_behavior = var.instance_initiated_shutdown_behavior
 
   instance_type = var.instance_type
 
   key_name = var.key_name
-
+  
   
   metadata_options {
     http_endpoint               = var.metadata_options_http_endpoint
@@ -216,34 +211,36 @@ resource "aws_launch_template" "eks_launch_template" {
 
   network_interfaces {
     associate_public_ip_address = var.network_interface_associate_public_ip_address
+    security_groups = var.launch_template_security_group_ids
   }
 
-  placement {
-    availability_zone = var.placement_availability_zone
-  }
+  # placement {
+  #   availability_zone = var.placement_availability_zone
+  # }
 
-  vpc_security_group_ids = var.launch_template_security_group_ids
 
   tag_specifications {
-    resource_type = "${var.cluster_name}-launch-template"
+    resource_type = "instance" 
 
     tags = {
       Name = "${var.cluster_name}-launch-template"
     }
   }
+  depends_on = [ var.launch_template_security_group_ids ]
 }
 
 
 resource "aws_eks_node_group" "node_group" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
-  node_group_name = "${var.cluster_name}-node-group"
+  node_group_name = "${var.cluster_name}-node-groups"
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = var.subnet_ids
-  # region          = var.aws_region
-  instance_types = var.instance_types
-  disk_size      = var.disk_size
-  capacity_type  = var.capacity_type
 
+  capacity_type  = var.capacity_type
+  launch_template {
+    id      = aws_launch_template.eks_launch_template.id
+    version = "$Latest"
+  }
   scaling_config {
     desired_size = 2
     max_size     = 2
@@ -255,7 +252,7 @@ resource "aws_eks_node_group" "node_group" {
   }
 
   tags = {
-    Name = "${var.cluster_name}-node-group"
+    Name = "${var.cluster_name}-node-groups"
   }
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
   # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.

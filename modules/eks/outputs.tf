@@ -33,22 +33,27 @@ output "oidc_provider_arn" {
   value       = aws_iam_openid_connect_provider.eks_oidc.arn
 }
 
-output "node_group_name" {
-  description = "Name of the EKS node group"
-  value       = aws_eks_node_group.node_group.node_group_name
-}
+# output "node_group_name" {
+#   description = "Name of the EKS node group"
+#   value       = aws_eks_node_group.node_group.node_group_name
+# }
 
-output "node_group_arn" {
-  description = "ARN of the EKS node group"
-  value       = aws_eks_node_group.node_group.arn
-}
+# output "node_group_arn" {
+#   description = "ARN of the EKS node group"
+#   value       = aws_eks_node_group.node_group.arn
+# }
 
-output "node_group_status" {
-  description = "Status of the EKS node group"
-  value       = aws_eks_node_group.node_group.status
-}
+# output "node_group_status" {
+#   description = "Status of the EKS node group"
+#   value       = aws_eks_node_group.node_group.status
+# }
 
-output "node_group_role_arn" {
-  description = "IAM role ARN associated with the node group"
-  value       = aws_eks_node_group.node_group.node_role_arn
+# output "node_group_role_arn" {
+#   description = "IAM role ARN associated with the node group"
+#   value       = aws_eks_node_group.node_group.node_role_arn
+# }
+output "ebs_encryption_key_arn" {
+  description = "ARN of the KMS key used for EBS encryption"
+  value       = aws_kms_key.eks_launch_template_cmk.arn
+  
 }

@@ -60,11 +60,7 @@ resource "aws_security_group" "eks_worker_node_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "eks-to-rds-prod-${count.index}"
-  }
 
-  depends_on = [module.eks]
 }
 resource "aws_security_group_rule" "node_to_node" {
   description       = "Allow worker nodes to communicate with each other"

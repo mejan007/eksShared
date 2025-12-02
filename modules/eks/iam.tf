@@ -46,7 +46,7 @@ resource "aws_iam_role_policy_attachment" "node_group-AmazonEKSWorkerNodePolicy"
 
 resource "aws_iam_role_policy_attachment" "node_group-AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.node_group.name
+  role       = aws_iam_role.node_group.name 
 }
 
 resource "aws_iam_role_policy_attachment" "node_group-AmazonEC2ContainerRegistryReadOnly" {
@@ -57,7 +57,30 @@ resource "aws_iam_role_policy_attachment" "node_group-AmazonEC2ContainerRegistry
 resource "aws_iam_instance_profile" "node_group" {
   name = "${var.cluster_name}-eks-node-group-instance-profile"
   role = aws_iam_role.node_group.name
-  
+
+}
+resource "aws_iam_role_policy" "kms_for_worker" {
+  name = "${var.cluster_name}-eks-worker-kms-policy"
+  role = aws_iam_role.node_group.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKeyWithoutPlaintext",
+          "kms:CreateGrant"
+        ]
+        Resource = aws_kms_key.eks_launch_template_cmk.arn
+      }
+    ]
+  })
+
 }
 
 
@@ -118,11 +141,11 @@ resource "aws_iam_role_policy_attachment" "alb_controller_attach" {
 ### EKS Acess Entries ( Instead of aws-auth ConfigMap)
 
 resource "aws_eks_access_entry" "eks_access_entry" {
-  for_each = toset(var.ec2_roles_for_eks)
-  cluster_name      = aws_eks_cluster.eks_cluster.name
+  for_each      = toset(var.ec2_roles_for_eks)
+  cluster_name  = aws_eks_cluster.eks_cluster.name
   principal_arn = each.value
- 
-  type              = "STANDARD"
+
+  type = "STANDARD"
 }
 
 
@@ -134,12 +157,12 @@ resource "aws_eks_access_policy_association" "eks_access_policy_association" {
   principal_arn = each.value
 
 
-  
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
   # principal_arn = aws_eks_access_entry.eks_access_entry.principal_arn
 
   access_scope {
-    type       = "cluster"
-   
+    type = "cluster"
+
   }
 }
