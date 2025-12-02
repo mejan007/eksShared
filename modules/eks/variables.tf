@@ -92,9 +92,9 @@ variable "project_name" {
 }
 
 variable "ec2_role_for_eks" {
-  type = string 
+  type        = string
   description = "ec2 role for the eks access identity"
-  
+
 }
 
 
@@ -104,12 +104,126 @@ variable "ec2_roles_for_eks" {
   description = "List of IAM role ARNs to be granted access to the EKS cluster."
 
   default = [
-    "arn:aws:iam::702865854817:role/mejan-self-hosted-runner-bastion-role" ,
+    "arn:aws:iam::702865854817:role/mejan-self-hosted-runner-bastion-role",
     "arn:aws:iam::702865854817:role/bastion-iam-role",
     "arn:aws:iam::702865854817:role/ec2-instance-role-amrit",
-  "arn:aws:iam::702865854817:role/madhu-iam-role",
-
-    "arn:aws:ec2:us-east-1:702865854817:instance/i-0870ec38316f8f099",
+    "arn:aws:iam::702865854817:role/madhu-iam-role"
 
   ]
+}
+
+
+variable "launch_template_ebs_size" {
+  description = "Size of the EBS volume for the launch template."
+  type        = number
+  default     = 30
+  
+}
+variable "launch_template_ebs_encryption_flag" {
+  description = "Whether the EBS volume for the launch template is encrypted."
+  type        = bool
+  default     = true
+}
+variable "capacity_reservation_preference" {
+  description = "The capacity reservation preference for the launch template."
+  type        = string
+  default     = "open"
+  
+}
+variable "cpu_core_count" {
+  description = "The number of CPU cores for the launch template."
+  type        = number
+  default     = 2
+}
+variable "cpu_threads_per_core" {
+  description = "The number of threads per CPU core for the launch template."
+  type        = number
+  default     = 1
+}
+variable "credit_specification_cpu_credits" {
+  description = "The CPU credit option for the launch template."
+  type        = string
+  default     = "standard"
+}
+variable "disable_api_stop" {
+  description = "Whether to disable API stop for the launch template."
+  type        = bool
+  default     = true
+}
+variable "disable_api_termination" {
+  description = "Whether to disable API termination for the launch template."
+  type        = bool
+  default     = true 
+}
+variable "ebs_optimized" {
+  description = "Whether the launch template is EBS optimized."
+  type        = bool
+  default     = true
+}
+variable "ami_id" {
+  description = "AMI ID for the launch template."
+  type        = string
+  default     = "ami-0fa3fe0fa7920f68e"
+}
+
+variable "instance_initiated_shutdown_behavior" {
+  description = "The shutdown behavior for instances launched from the launch template."
+  type        = string
+  default     = "terminate"
+}
+variable "instance_market_type" {
+  description = "The market type for instances launched from the launch template."
+  type        = string
+  default     = "spot"
+}
+variable "instance_type" {
+  description = "The instance type for instances launched from the launch template."
+  type        = string
+  default     = "t3.medium"
+}
+variable "key_name" {
+  description = "The key name for instances launched from the launch template."
+  type        = string
+  default     = "eks-key"
+}
+variable "metadata_options_http_endpoint" {
+  description = "The http endpoint setting for instances launched from the launch template."
+  type        = string
+  default     = "enabled"
+}
+variable "metadata_options_http_tokens" {
+  description = "The http tokens setting for instances launched from the launch template."
+  type        = string
+  default     = "required"
+}
+variable "metadata_options_http_put_response_hop_limit" {
+  description = "The http put response hop limit for instances launched from the launch template."
+  type        = number
+  default     = 1
+}
+variable "metadata_options_instance_metadata_tags" {
+  description = "The instance metadata tags setting for instances launched from the launch template."
+  type        = string
+  default     = "enabled"
+}
+variable "monitoring_enabled" {
+  description = "Whether monitoring is enabled for instances launched from the launch template."
+  type        = bool
+  default     = true
+}
+variable "network_interface_associate_public_ip_address" {
+  description = "Whether to associate a public IP address with the network interface for instances launched from the launch template."
+  type        = bool
+  default     = false
+}
+variable "placement_availability_zone" {
+  description = "The availability zone for instances launched from the launch template."
+  type        = string
+  default     = "us-east-1a"
+}
+variable "launch_template_security_group_ids" {
+  description = "List of security group IDs for the launch template."
+  type        = list(string)
+  default     = []
+  
 }

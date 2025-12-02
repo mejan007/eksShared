@@ -32,45 +32,18 @@ module "rds_mysql" {
   allocated_storage = var.rds_allocated_storage
   engine_version    = var.rds_engine_version
 
-  depends_on = [ module.eks ]
-}
-
-# Security Group: Allow EKS to connect to RDS
-resource "aws_security_group" "eks_to_rds_prod" {
-  count       = var.create_rds
-  name        = "eks-to-rds-prod-${count.index}"
-  description = "Allow EKS cluster to connect to RDS MySQL"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    description                = "Allow inbound MySQL from the EKS service"
-    from_port                  = 3306
-    to_port                    = 3306
-    protocol                   = "tcp"
-    security_groups            = [module.eks.cluster_security_group_id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "eks-to-rds-prod-${count.index}"
-  }
-
   depends_on = [module.eks]
 }
 
+
 module "eks" {
-  source       = "./modules/eks"
-  cluster_name = "ase-eks-cluster"
-  subnet_ids   = values(module.vpc.private_subnet_ids)
-  aws_region   = var.aws_region
-  ec2_role_for_eks = module.ec2.ec2_role_arn
-  authentication_mode = "API_AND_CONFIG_MAP" 
+  source              = "./modules/eks"
+  cluster_name        = "ase-eks-cluster"
+  subnet_ids          = values(module.vpc.private_subnet_ids)
+  aws_region          = var.aws_region
+  ec2_role_for_eks    = module.ec2.ec2_role_arn
+  authentication_mode = "API_AND_CONFIG_MAP"
+  launch_template_security_group_ids = [resource.aws_security_group.eks_worker_node_sg.id]
 
 }
 
@@ -108,14 +81,3 @@ module "ec2" {
   ]
 
 }
-
-resource "aws_security_group_rule" "bastion_to_eks_controlplane" {
-  description              = "Allow bastion to access EKS API endpoint"
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-
-  security_group_id        = module.eks.cluster_security_group_id
-  cidr_blocks              = ["10.0.0.0/16"]
-  }

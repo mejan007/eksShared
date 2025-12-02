@@ -12,7 +12,8 @@ resource "aws_eks_cluster" "eks_cluster" {
     # Set to true to allow private access from within the VPC
     endpoint_private_access = true
   }
-
+  bootstrap_self_managed_addons = false
+  
   dynamic "kubernetes_network_config" {
     for_each = var.enable_kubernetes_network_config ? [1] : []
 
@@ -60,6 +61,177 @@ resource "aws_eks_cluster" "eks_cluster" {
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
 }
 
+resource "aws_eks_addon" "core_dns" {
+  cluster_name = aws_eks_cluster.eks_cluster.name
+  addon_version = "v1.12.3-eksbuild.1"
+  addon_name   = "core-dns"
+}
+resource "aws_eks_addon" "metrics_server" {
+  cluster_name = aws_eks_cluster.eks_cluster.name
+  addon_version = "v0.8.0-eksbuild.5"
+  addon_name   = "metrics-server"
+}
+resource "aws_eks_addon" "kube_proxy" {
+  cluster_name = aws_eks_cluster.eks_cluster.name
+  addon_version = "v1.34.1-eksbuild.2"
+  addon_name   = "kube-proxy"
+  
+}
+
+resource "aws_kms_key" "eks_launch_template_cmk" {
+  description             = "KMS key for EKS Launch Template EBS volume encryption"
+  enable_key_rotation     = true
+  deletion_window_in_days = 20
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "key-default-1"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow administration of the key"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/*"
+        },
+        Action = [
+          "kms:ReplicateKey",
+          "kms:Create*",
+          "kms:Describe*",
+          "kms:Enable*",
+          "kms:List*",
+          "kms:Put*",
+          "kms:Update*",
+          "kms:Revoke*",
+          "kms:Disable*",
+          "kms:Get*",
+          "kms:Delete*",
+          "kms:ScheduleKeyDeletion",
+          "kms:CancelKeyDeletion"
+        ],
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow use of the key"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/*"
+        },
+        Action = [
+          "kms:DescribeKey",
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey",
+          "kms:GenerateDataKeyWithoutPlaintext"
+        ],
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow EBS to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+
+    ]
+  })
+}
+
+
+resource "aws_launch_template" "eks_launch_template" {
+  name = "${var.cluster_name}-launch-template"
+
+  block_device_mappings {
+    device_name = "/dev/sdf"
+
+    ebs {
+      volume_size = var.launch_template_ebs_size
+      encrypted   = var.launch_template_ebs_encryption_flag
+      kms_key_id  = var.launch_template_ebs_encryption_flag ? aws_kms_key.eks_launch_template_cmk.arn : null
+    }
+  }
+
+  capacity_reservation_specification {
+    capacity_reservation_preference = var.capacity_reservation_preference
+  }
+
+  cpu_options {
+    core_count       = var.cpu_core_count
+    threads_per_core = var.cpu_threads_per_core
+  }
+
+  credit_specification {
+    cpu_credits = var.credit_specification_cpu_credits
+  }
+
+  disable_api_stop        = var.disable_api_stop
+  disable_api_termination = var.disable_api_termination
+
+  ebs_optimized = var.ebs_optimized
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.node_group.name
+  }
+
+  image_id = var.ami_id
+
+  instance_initiated_shutdown_behavior = var.instance_initiated_shutdown_behavior
+
+  instance_market_options {
+    market_type = var.instance_market_type
+  }
+
+  instance_type = var.instance_type
+
+  key_name = var.key_name
+
+  
+  metadata_options {
+    http_endpoint               = var.metadata_options_http_endpoint
+    http_tokens                 = var.metadata_options_http_tokens
+    http_put_response_hop_limit = var.metadata_options_http_put_response_hop_limit
+    instance_metadata_tags      = var.metadata_options_instance_metadata_tags
+  }
+
+  monitoring {
+    enabled = var.monitoring_enabled
+  }
+
+  network_interfaces {
+    associate_public_ip_address = var.network_interface_associate_public_ip_address
+  }
+
+  placement {
+    availability_zone = var.placement_availability_zone
+  }
+
+  vpc_security_group_ids = var.launch_template_security_group_ids
+
+  tag_specifications {
+    resource_type = "${var.cluster_name}-launch-template"
+
+    tags = {
+      Name = "${var.cluster_name}-launch-template"
+    }
+  }
+}
 
 
 resource "aws_eks_node_group" "node_group" {
@@ -68,9 +240,10 @@ resource "aws_eks_node_group" "node_group" {
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = var.subnet_ids
   # region          = var.aws_region
-  instance_types  = var.instance_types
-  disk_size       = var.disk_size
-  capacity_type   = var.capacity_type
+  instance_types = var.instance_types
+  disk_size      = var.disk_size
+  capacity_type  = var.capacity_type
+
   scaling_config {
     desired_size = 2
     max_size     = 2

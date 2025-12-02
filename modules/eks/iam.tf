@@ -54,6 +54,12 @@ resource "aws_iam_role_policy_attachment" "node_group-AmazonEC2ContainerRegistry
   role       = aws_iam_role.node_group.name
 }
 
+resource "aws_iam_instance_profile" "node_group" {
+  name = "${var.cluster_name}-eks-node-group-instance-profile"
+  role = aws_iam_role.node_group.name
+  
+}
+
 
 resource "aws_iam_role" "irsa_role" {
   name = "${var.project_name}-example-irsa-role"
