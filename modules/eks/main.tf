@@ -64,22 +64,21 @@ resource "aws_eks_cluster" "eks_cluster" {
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
 }
 
-# resource "aws_eks_addon" "core_dns" {
-#   cluster_name = aws_eks_cluster.eks_cluster.name
-#   addon_version = "v1.12.3-eksbuild.1"
-#   addon_name   = "core-dns"
-# }
-# resource "aws_eks_addon" "metrics_server" {
-#   cluster_name = aws_eks_cluster.eks_cluster.name
-#   addon_version = "v0.8.0-eksbuild.5"
-#   addon_name   = "metrics-server"
-# }
-# resource "aws_eks_addon" "kube_proxy" {
-#   cluster_name = aws_eks_cluster.eks_cluster.name
-#   addon_version = "v1.34.1-eksbuild.2"
-#   addon_name   = "kube-proxy"
-  
-# }
+resource "aws_eks_addon" "core_dns" {
+  cluster_name = aws_eks_cluster.eks_cluster.name
+  addon_version = "v1.12.3-eksbuild.1"
+  addon_name   = "core-dns"
+}
+resource "aws_eks_addon" "metrics_server" {
+  cluster_name = aws_eks_cluster.eks_cluster.name
+  addon_version = "v0.8.0-eksbuild.5"
+  addon_name   = "metrics-server"
+}
+resource "aws_eks_addon" "kube_proxy" {
+  cluster_name = aws_eks_cluster.eks_cluster.name
+  addon_version = "v1.34.1-eksbuild.2"
+  addon_name   = "kube-proxy"
+}
 
 resource "aws_kms_key" "eks_launch_template_cmk" {
   description             = "KMS key for EKS Launch Template EBS volume encryption"
