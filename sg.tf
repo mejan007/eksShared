@@ -72,3 +72,39 @@ resource "aws_security_group_rule" "node_to_node" {
   source_security_group_id = aws_security_group.eks_worker_node_sg.id
   depends_on               = [aws_security_group.eks_worker_node_sg]
 }
+
+# Allow worker nodes to communicate with the control plane
+resource "aws_security_group_rule" "worker_to_controlplane" {
+  description              = "Allow worker nodes to communicate with control plane"
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.eks.cluster_security_group_id
+  source_security_group_id = aws_security_group.eks_worker_node_sg.id
+  depends_on               = [aws_security_group.eks_worker_node_sg, module.eks]
+}
+
+# Allow control plane to communicate with worker nodes (kubelet)
+resource "aws_security_group_rule" "controlplane_to_worker" {
+  description              = "Allow control plane to communicate with worker nodes"
+  type                     = "ingress"
+  from_port                = 10250
+  to_port                  = 10250
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_worker_node_sg.id
+  source_security_group_id = module.eks.cluster_security_group_id
+  depends_on               = [aws_security_group.eks_worker_node_sg, module.eks]
+}
+
+# Allow control plane to reach worker nodes for extensions (metrics, logs, etc)
+resource "aws_security_group_rule" "controlplane_to_worker_extensions" {
+  description              = "Allow control plane to worker nodes for extension API calls"
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_worker_node_sg.id
+  source_security_group_id = module.eks.cluster_security_group_id
+  depends_on               = [aws_security_group.eks_worker_node_sg, module.eks]
+}

@@ -70,20 +70,30 @@ resource "aws_eks_addon" "vpc_cni" {
   addon_name    = "vpc-cni"
 }
 
-resource "aws_eks_addon" "core_dns" {
-  cluster_name  = aws_eks_cluster.eks_cluster.name
-  addon_version = "v1.12.3-eksbuild.1"
-  addon_name    = "core-dns"
-}
-resource "aws_eks_addon" "metrics_server" {
-  cluster_name  = aws_eks_cluster.eks_cluster.name
-  addon_version = "v0.8.0-eksbuild.5"
-  addon_name    = "metrics-server"
-}
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name  = aws_eks_cluster.eks_cluster.name
   addon_version = "v1.34.1-eksbuild.2"
   addon_name    = "kube-proxy"
+}
+
+resource "aws_eks_addon" "core_dns" {
+  cluster_name                = aws_eks_cluster.eks_cluster.name
+  addon_version               = "v1.12.4-eksbuild.1"  
+  addon_name                  = "coredns"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  
+  depends_on = [aws_eks_node_group.node_group]
+}
+
+resource "aws_eks_addon" "metrics_server" {
+  cluster_name                = aws_eks_cluster.eks_cluster.name
+  addon_version               = "v0.8.0-eksbuild.5"
+  addon_name                  = "metrics-server"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  
+  depends_on = [aws_eks_node_group.node_group]
 }
 
 resource "aws_kms_key" "eks_launch_template_cmk" {
@@ -163,20 +173,19 @@ resource "aws_kms_key" "eks_launch_template_cmk" {
 }
 
 resource "aws_autoscaling_lifecycle_hook" "launch" {
-  name                    = "lifecycle-hook-launch-for-${var.cluster_name}"
-  autoscaling_group_name  = aws_eks_node_group.node_group.resources[0].autoscaling_groups[0].name
-  lifecycle_transition    = "autoscaling:EC2_INSTANCE_LAUNCHING"
-  heartbeat_timeout       = 300
-  default_result          = "CONTINUE"
-  notification_target_arn = "arn:aws:sns:us-east-1:202063039780:eks-asg-lifecycle-hook-topic"
+  name                   = "lifecycle-hook-launch-for-${var.cluster_name}"
+  autoscaling_group_name = aws_eks_node_group.node_group.resources[0].autoscaling_groups[0].name
+  lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+  heartbeat_timeout      = 300
+  default_result         = "CONTINUE"
 }
+
 resource "aws_autoscaling_lifecycle_hook" "terminate" {
-  name                    = "lifecycle-hook-launch-for-${var.cluster_name}"
-  autoscaling_group_name  = aws_eks_node_group.node_group.resources[0].autoscaling_groups[0].name
-  lifecycle_transition    = "autoscaling:EC2_INSTANCE_TERMINATING"
-  heartbeat_timeout       = 300
-  default_result          = "CONTINUE"
-  notification_target_arn = "arn:aws:sns:us-east-1:202063039780:eks-asg-lifecycle-hook-topic"
+  name                   = "lifecycle-hook-terminate-for-${var.cluster_name}"
+  autoscaling_group_name = aws_eks_node_group.node_group.resources[0].autoscaling_groups[0].name
+  lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
+  heartbeat_timeout      = 300
+  default_result         = "CONTINUE"
 }
 
 
@@ -184,12 +193,13 @@ resource "aws_launch_template" "eks_launch_template" {
   name = "${var.cluster_name}-launch-template"
 
   block_device_mappings {
-    device_name = "/dev/sdf"
+    device_name = "/dev/xvda"
 
     ebs {
       volume_size = var.launch_template_ebs_size
       encrypted   = var.launch_template_ebs_encryption_flag
       kms_key_id  = var.launch_template_ebs_encryption_flag ? aws_kms_key.eks_launch_template_cmk.arn : null
+      volume_type = "gp3"
     }
   }
 
@@ -211,13 +221,15 @@ resource "aws_launch_template" "eks_launch_template" {
 
   ebs_optimized = var.ebs_optimized
 
-  image_id = var.ami_id
+  # image_id removed - letting AWS manage AMI via ami_type in node group
 
   # instance_initiated_shutdown_behavior = var.instance_initiated_shutdown_behavior
 
   instance_type = var.instance_type
 
   key_name = var.key_name
+
+  # user_data removed - AWS handles bootstrap automatically when ami_type is set
 
 
   metadata_options {
@@ -257,6 +269,7 @@ resource "aws_eks_node_group" "node_group" {
   node_group_name = "${var.cluster_name}-node-group-new"
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = var.subnet_ids
+  ami_type        = "AL2023_x86_64_STANDARD"
 
   capacity_type = var.capacity_type
   launch_template {
@@ -276,8 +289,15 @@ resource "aws_eks_node_group" "node_group" {
   tags = {
     Name = "${var.cluster_name}-node-groups"
   }
+  
+  timeouts {
+    create = "15m"
+    update = "15m"
+    delete = "15m"
+  }
+  
   lifecycle {
-
+    ignore_changes = [scaling_config[0].desired_size]
   }
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
   # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
@@ -285,6 +305,8 @@ resource "aws_eks_node_group" "node_group" {
     aws_iam_role_policy_attachment.node_group-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.node_group-AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.node_group-AmazonEC2ContainerRegistryReadOnly,
+    aws_eks_addon.vpc_cni,
+    aws_eks_addon.kube_proxy,
   ]
 }
 

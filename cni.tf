@@ -1,6 +1,6 @@
 
 
-# # Install Cilium using the Cilium Terraform provider
+# Install Cilium using the Cilium Terraform provider
 # resource "cilium" "overlay" {
 #   name     = "cilium"
 #   repository = "https://helm.cilium.io/"
@@ -27,7 +27,8 @@
 #     "hubble.relay.enabled=true",
 
 #     # Use eBPF for masquerading (NAT) traffic leaving the cluster instead of iptables
-#     "bpf.masquerade=true"
+#     "bpf.masquerade=true",
+#     "hostNetworking=true",
 #   ]
 
 #   wait = true
