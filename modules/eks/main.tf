@@ -93,7 +93,7 @@ resource "aws_kms_key" "eks_launch_template_cmk" {
         Sid    = "Enable IAM User Permissions"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          AWS = "*"
         },
         Action   = "kms:*"
         Resource = "*"
@@ -102,7 +102,7 @@ resource "aws_kms_key" "eks_launch_template_cmk" {
         Sid    = "Allow administration of the key"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          AWS = "*"
         },
         Action = [
           "kms:ReplicateKey",
@@ -125,7 +125,7 @@ resource "aws_kms_key" "eks_launch_template_cmk" {
         Sid    = "Allow use of the key"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          AWS = "*"
         },
         Action = [
           "kms:DescribeKey",
@@ -232,7 +232,7 @@ resource "aws_launch_template" "eks_launch_template" {
 
 resource "aws_eks_node_group" "node_group" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
-  node_group_name = "${var.cluster_name}-node-groups"
+  node_group_name = "${var.cluster_name}-node-group-new"
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = var.subnet_ids
 
