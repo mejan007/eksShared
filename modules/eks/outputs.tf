@@ -55,5 +55,5 @@ output "oidc_provider_arn" {
 output "ebs_encryption_key_arn" {
   description = "ARN of the KMS key used for EBS encryption"
   value       = aws_kms_key.eks_launch_template_cmk.arn
-  
+
 }

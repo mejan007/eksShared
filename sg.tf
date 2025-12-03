@@ -63,12 +63,12 @@ resource "aws_security_group" "eks_worker_node_sg" {
 
 }
 resource "aws_security_group_rule" "node_to_node" {
-  description       = "Allow worker nodes to communicate with each other"
-  type              = "ingress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  security_group_id = aws_security_group.eks_worker_node_sg.id
+  description              = "Allow worker nodes to communicate with each other"
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  security_group_id        = aws_security_group.eks_worker_node_sg.id
   source_security_group_id = aws_security_group.eks_worker_node_sg.id
-  depends_on = [ aws_security_group.eks_worker_node_sg ]
+  depends_on               = [aws_security_group.eks_worker_node_sg]
 }

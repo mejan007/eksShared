@@ -117,7 +117,7 @@ variable "launch_template_ebs_size" {
   description = "Size of the EBS volume for the launch template."
   type        = number
   default     = 30
-  
+
 }
 variable "launch_template_ebs_encryption_flag" {
   description = "Whether the EBS volume for the launch template is encrypted."
@@ -128,7 +128,7 @@ variable "capacity_reservation_preference" {
   description = "The capacity reservation preference for the launch template."
   type        = string
   default     = "open"
-  
+
 }
 variable "cpu_core_count" {
   description = "The number of CPU cores for the launch template."
@@ -153,7 +153,7 @@ variable "disable_api_stop" {
 variable "disable_api_termination" {
   description = "Whether to disable API termination for the launch template."
   type        = bool
-  default     = true 
+  default     = true
 }
 variable "ebs_optimized" {
   description = "Whether the launch template is EBS optimized."
@@ -225,5 +225,5 @@ variable "launch_template_security_group_ids" {
   description = "List of security group IDs for the launch template."
   type        = list(string)
   default     = []
-  
+
 }

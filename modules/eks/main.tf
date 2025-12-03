@@ -1,5 +1,5 @@
 data "aws_caller_identity" "current" {}
-  
+
 
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
@@ -15,8 +15,8 @@ resource "aws_eks_cluster" "eks_cluster" {
     # Set to true to allow private access from within the VPC
     endpoint_private_access = true
   }
-  bootstrap_self_managed_addons = true
-  
+  bootstrap_self_managed_addons = false
+
   dynamic "kubernetes_network_config" {
     for_each = var.enable_kubernetes_network_config ? [1] : []
 
@@ -64,20 +64,26 @@ resource "aws_eks_cluster" "eks_cluster" {
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
 }
 
+resource "aws_eks_addon" "vpc_cni" {
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  addon_version = "v1.20.4-eksbuild.1"
+  addon_name    = "vpc-cni"
+}
+
 resource "aws_eks_addon" "core_dns" {
-  cluster_name = aws_eks_cluster.eks_cluster.name
+  cluster_name  = aws_eks_cluster.eks_cluster.name
   addon_version = "v1.12.3-eksbuild.1"
-  addon_name   = "core-dns"
+  addon_name    = "core-dns"
 }
 resource "aws_eks_addon" "metrics_server" {
-  cluster_name = aws_eks_cluster.eks_cluster.name
+  cluster_name  = aws_eks_cluster.eks_cluster.name
   addon_version = "v0.8.0-eksbuild.5"
-  addon_name   = "metrics-server"
+  addon_name    = "metrics-server"
 }
 resource "aws_eks_addon" "kube_proxy" {
-  cluster_name = aws_eks_cluster.eks_cluster.name
+  cluster_name  = aws_eks_cluster.eks_cluster.name
   addon_version = "v1.34.1-eksbuild.2"
-  addon_name   = "kube-proxy"
+  addon_name    = "kube-proxy"
 }
 
 resource "aws_kms_key" "eks_launch_template_cmk" {
@@ -212,8 +218,8 @@ resource "aws_launch_template" "eks_launch_template" {
   instance_type = var.instance_type
 
   key_name = var.key_name
-  
-  
+
+
   metadata_options {
     http_endpoint               = var.metadata_options_http_endpoint
     http_tokens                 = var.metadata_options_http_tokens
@@ -227,7 +233,7 @@ resource "aws_launch_template" "eks_launch_template" {
 
   network_interfaces {
     associate_public_ip_address = var.network_interface_associate_public_ip_address
-    security_groups = var.launch_template_security_group_ids
+    security_groups             = var.launch_template_security_group_ids
   }
 
   # placement {
@@ -236,13 +242,13 @@ resource "aws_launch_template" "eks_launch_template" {
 
 
   tag_specifications {
-    resource_type = "instance" 
+    resource_type = "instance"
 
     tags = {
       Name = "${var.cluster_name}-launch-template"
     }
   }
-  depends_on = [ var.launch_template_security_group_ids ]
+  depends_on = [var.launch_template_security_group_ids]
 }
 
 
@@ -252,7 +258,7 @@ resource "aws_eks_node_group" "node_group" {
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = var.subnet_ids
 
-  capacity_type  = var.capacity_type
+  capacity_type = var.capacity_type
   launch_template {
     id      = aws_launch_template.eks_launch_template.id
     version = "$Latest"
@@ -271,7 +277,7 @@ resource "aws_eks_node_group" "node_group" {
     Name = "${var.cluster_name}-node-groups"
   }
   lifecycle {
-    
+
   }
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
   # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
