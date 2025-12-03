@@ -157,6 +157,23 @@ resource "aws_kms_key" "eks_launch_template_cmk" {
   })
 }
 
+resource "aws_autoscaling_lifecycle_hook" "launch" {
+  name                    = "lifecycle-hook-launch-for-${var.cluster_name}"
+  autoscaling_group_name  = aws_eks_node_group.node_group.resources[0].autoscaling_groups[0].name
+  lifecycle_transition    = "autoscaling:EC2_INSTANCE_LAUNCHING"
+  heartbeat_timeout       = 300
+  default_result          = "CONTINUE"
+  notification_target_arn = "arn:aws:sns:us-east-1:202063039780:eks-asg-lifecycle-hook-topic"
+}
+resource "aws_autoscaling_lifecycle_hook" "terminate" {
+  name                    = "lifecycle-hook-launch-for-${var.cluster_name}"
+  autoscaling_group_name  = aws_eks_node_group.node_group.resources[0].autoscaling_groups[0].name
+  lifecycle_transition    = "autoscaling:EC2_INSTANCE_TERMINATING"
+  heartbeat_timeout       = 300
+  default_result          = "CONTINUE"
+  notification_target_arn = "arn:aws:sns:us-east-1:202063039780:eks-asg-lifecycle-hook-topic"
+}
+
 
 resource "aws_launch_template" "eks_launch_template" {
   name = "${var.cluster_name}-launch-template"
@@ -253,6 +270,9 @@ resource "aws_eks_node_group" "node_group" {
 
   tags = {
     Name = "${var.cluster_name}-node-groups"
+  }
+  lifecycle {
+    
   }
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
   # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
