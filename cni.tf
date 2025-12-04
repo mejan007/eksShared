@@ -81,7 +81,7 @@ resource "helm_release" "helmCilium" {
 
   set {
     name  = "gatewayAPI.enabled"
-    value = "true"
+    value = "false"
   }
 
   # kube-proxy replacement (commented out like original)
