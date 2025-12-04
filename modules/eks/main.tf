@@ -305,8 +305,8 @@ resource "aws_eks_node_group" "node_group" {
     aws_iam_role_policy_attachment.node_group-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.node_group-AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.node_group-AmazonEC2ContainerRegistryReadOnly,
-    aws_eks_addon.vpc_cni,
-    aws_eks_addon.kube_proxy,
+    # aws_eks_addon.vpc_cni,
+    # aws_eks_addon.kube_proxy,
   ]
 }
 
