@@ -9,9 +9,14 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.5"
     }
-    cilium = {
-      source  = "littlejo/cilium"
-      version = "~> 0.3.2"}
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.12"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.25"
+    }
   }
 }
 
@@ -19,6 +24,12 @@ provider "aws" {
   region = var.aws_region
 }
 
-provider "cilium" {
+provider "helm" {
+  kubernetes {
+    config_path = pathexpand("~/.kube/config")
+  }
+}
+
+provider "kubernetes" {
   config_path = pathexpand("~/.kube/config")
 }
