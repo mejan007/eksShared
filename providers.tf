@@ -20,5 +20,5 @@ provider "aws" {
 }
 
 provider "cilium" {
-  config_path = "~/.kube/config"
+  config_path = pathexpand("~/.kube/config")
 }
