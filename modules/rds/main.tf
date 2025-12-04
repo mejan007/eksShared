@@ -22,7 +22,7 @@ resource "random_password" "db_password" {
 
 resource "aws_secretsmanager_secret" "db_credentials" {
   count = var.create_rds
-  name  = "${local.name_prefix}-db-credentials"
+  name  = "${local.name_prefix}-db-credential"
   tags  = local.tags
 }
 

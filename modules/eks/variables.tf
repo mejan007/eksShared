@@ -104,11 +104,7 @@ variable "ec2_roles_for_eks" {
   description = "List of IAM role ARNs to be granted access to the EKS cluster."
 
   default = [
-    "arn:aws:iam::702865854817:role/mejan-self-hosted-runner-bastion-role",
-    "arn:aws:iam::702865854817:role/bastion-iam-role",
-    "arn:aws:iam::702865854817:role/ec2-instance-role-amrit",
-    "arn:aws:iam::702865854817:role/madhu-iam-role"
-
+    "arn:aws:iam::702865854817:role/self-hosted-runner-role"
   ]
 }
 
