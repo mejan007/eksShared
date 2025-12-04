@@ -79,6 +79,31 @@ resource "aws_iam_role_policy" "eks_access_policy" {
 }
 
 
+resource "aws_iam_role_policy" "ec2_s3_access_policy" {
+  name = "ec2-s3-access-policy"
+  role = aws_iam_role.runner_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::eks-shared-remote-backend",
+          "arn:aws:s3:::eks-shared-remote-backend/*"
+        ]
+      }
+    ]
+  })
+  
+}
+
 resource "aws_iam_instance_profile" "runner_profile" {
   name = "self-hosted-runner-profile"
   role = aws_iam_role.runner_role.name
