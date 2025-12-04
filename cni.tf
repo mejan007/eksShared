@@ -36,7 +36,7 @@
 #   wait = true
 # }
 
-resource "helm_release" "cilium" {
+resource "helm_release" "helmCilium" {
   name       = "cilium"
   repository = "https://helm.cilium.io/"
   chart      = "cilium"
