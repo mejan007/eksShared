@@ -7,6 +7,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.5
+
       - name: Terraform init
 
         run: terraform init
