@@ -270,7 +270,7 @@ resource "aws_iam_role_policy" "karpenter_controller" {
         Sid      = "PassNodeIAMRole"
         Effect   = "Allow"
         Action   = "iam:PassRole"
-        Resource = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.karpenter.account_id}:role/KarpenterNodeRole-${var.cluster_name}"
+        Resource = aws_iam_role.node_group.arn
       },
       {
         Sid      = "EKSClusterEndpointLookup"
