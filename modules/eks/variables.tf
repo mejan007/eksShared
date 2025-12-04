@@ -223,3 +223,9 @@ variable "launch_template_security_group_ids" {
   default     = []
 
 }
+
+variable "karpenter_namespace" {
+  description = "Namespace where Karpenter will be deployed"
+  type        = string
+  default     = "kube-system"
+}
