@@ -85,20 +85,20 @@ resource "helm_release" "helmCilium" {
   }
 
   # kube-proxy replacement (commented out like original)
-  # set {
-  #   name  = "kubeProxyReplacement"
-  #   value = "false"
-  # }
+  set {
+    name  = "kubeProxyReplacement"
+    value = "false"
+  }
 
-  # set {
-  #   name  = "k8sServiceHost"
-  #   value = replace(module.eks.cluster_endpoint, "https://", "")
-  # }
+  set {
+    name  = "k8sServiceHost"
+    value = replace(module.eks.cluster_endpoint, "https://", "")
+  }
 
-  # set {
-  #   name  = "k8sServicePort"
-  #   value = "443"
-  # }
+  set {
+    name  = "k8sServicePort"
+    value = "443"
+  }
 
   # Hubble / observability
   set {
@@ -117,15 +117,15 @@ resource "helm_release" "helmCilium" {
   }
 
   # masquerading, hostNetworking (kept commented exactly)
-  # set {
-  #   name  = "bpf.masquerade"
-  #   value = "true"
-  # }
+  set {
+    name  = "bpf.masquerade"
+    value = "true"
+  }
 
-  # set {
-  #   name  = "hostNetworking"
-  #   value = "true"
-  # }
+#   set {
+#     name  = "hostNetworking"
+#     value = "true"
+#   }
 
   wait = true
 }
