@@ -1,0 +1,23 @@
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Terraform init
+
+        run: terraform init
+    
+      - name: Terraform fmt and validate
+        run: |
+          terraform fmt -recursive
+          terraform validate
+      
+      - name: Terraform plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan
