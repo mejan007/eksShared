@@ -17,7 +17,11 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.25"
     }
-  }
+  #   cilium = {
+  #     source  = "littlejo/cilium"
+  #     version = "~> 0.3.2"
+  # }
+}
 }
 
 provider "aws" {
