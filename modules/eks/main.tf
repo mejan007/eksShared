@@ -64,17 +64,17 @@ resource "aws_eks_cluster" "eks_cluster" {
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
 }
 
-resource "aws_eks_addon" "vpc_cni" {
-  cluster_name  = aws_eks_cluster.eks_cluster.name
-  addon_version = "v1.20.4-eksbuild.1"
-  addon_name    = "vpc-cni"
-}
+# resource "aws_eks_addon" "vpc_cni" {
+#   cluster_name  = aws_eks_cluster.eks_cluster.name
+#   addon_version = "v1.20.4-eksbuild.1"
+#   addon_name    = "vpc-cni"
+# }
 
-resource "aws_eks_addon" "kube_proxy" {
-  cluster_name  = aws_eks_cluster.eks_cluster.name
-  addon_version = "v1.34.1-eksbuild.2"
-  addon_name    = "kube-proxy"
-}
+# resource "aws_eks_addon" "kube_proxy" {
+#   cluster_name  = aws_eks_cluster.eks_cluster.name
+#   addon_version = "v1.34.1-eksbuild.2"
+#   addon_name    = "kube-proxy"
+# }
 
 resource "aws_eks_addon" "core_dns" {
   cluster_name                = aws_eks_cluster.eks_cluster.name
@@ -305,8 +305,8 @@ resource "aws_eks_node_group" "node_group" {
     aws_iam_role_policy_attachment.node_group-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.node_group-AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.node_group-AmazonEC2ContainerRegistryReadOnly,
-    aws_eks_addon.vpc_cni,
-    aws_eks_addon.kube_proxy,
+    # aws_eks_addon.vpc_cni,
+    # aws_eks_addon.kube_proxy,
   ]
 }
 
