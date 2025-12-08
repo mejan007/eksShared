@@ -45,13 +45,13 @@ resource "aws_security_group" "eks_worker_node_sg" {
   description = "Security group for EKS worker nodes"
   vpc_id      = module.vpc.vpc_id
 
-  # ingress {
-  #   description = "Allow bastion to access worker nodes"
-  #   from_port   = 443
-  #   to_port     = 443
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["10.0.0.0/16"]
-  # }
+  ingress {
+    description = "Allow NodePort traffic"
+    from_port   = 30000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
 
   egress {
     from_port   = 0
