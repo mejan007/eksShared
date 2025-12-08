@@ -1,0 +1,74 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: aws-alb
+  
+  ## Donot work but the logic is write just need to include that in the spec.parametersRef not 
+  ## in annotationos.
+
+  # annotations:
+  #   gateway.k8s.aws/loadBalancerConfiguration: public-alb-config
+
+spec:
+  controllerName: gateway.k8s.aws/alb
+  parametersRef:
+    group: gateway.k8s.aws
+    kind: LoadBalancerConfiguration
+    name: public-alb-config
+    namespace: default
+
+
+
+
+
+
+--- 
+
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-api
+  namespace: default
+
+  ## Not needed ( Even though mentioned in the DOCS and Donot Work )
+  ## can be done using the same spec.infrastructure.parametersRef.
+   
+  # annotations: 
+  #   service.beta.kubernetes.io/aws-load-balancer-type: "alb"
+  #   service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+spec:
+  gatewayClassName: aws-alb
+  infrastructure:
+    parametersRef:
+      group: gateway.k8s.aws
+      kind: LoadBalancerConfiguration
+      name: public-alb-config
+
+
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All  
+
+--- 
+
+
+apiVersion: gateway.k8s.aws/v1beta1
+kind: LoadBalancerConfiguration
+metadata:
+  name: public-alb-config 
+  namespace: default       
+spec:
+  scheme: internet-facing 
+  ipAddressType: ipv4
+ 
+
+
+
+
+
+

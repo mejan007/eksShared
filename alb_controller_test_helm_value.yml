@@ -384,7 +384,10 @@ enableGatewayAPI: true
 # controllerConfig specifies controller configuration
 controllerConfig:
   # featureGates set of key: value pairs that describe AWS load balance controller features
-  featureGates:  {}
+  featureGates:  
+    ALBGatewayAPI: true 
+    # ALBSingleSubnet: false
+    # NLBGatewayAPI: true
     # ALBGatewayAPI: true
   
   # ListenerRulesTagging: true
