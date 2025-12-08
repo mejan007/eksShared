@@ -87,7 +87,7 @@ resource "helm_release" "helmCilium" {
   # kube-proxy replacement (commented out like original)
   set {
     name  = "kubeProxyReplacement"
-    value = "false"
+    value = "true"
   }
 
   set {
