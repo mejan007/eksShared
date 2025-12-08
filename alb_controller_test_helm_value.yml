@@ -386,6 +386,8 @@ controllerConfig:
   # featureGates set of key: value pairs that describe AWS load balance controller features
   featureGates:  
     ALBGatewayAPI: true 
+  extraArgs:
+    webhook-serve-address: "0.0.0.0"
     # ALBSingleSubnet: false
     # NLBGatewayAPI: true
     # ALBGatewayAPI: true
