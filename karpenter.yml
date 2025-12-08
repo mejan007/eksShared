@@ -496,10 +496,10 @@ spec:
     - alias: "al2023@latest"
   subnetSelectorTerms:
     - tags:
-        karpenter.sh/discovery: "ase-eks-cluster" # replace with your cluster name
+        karpenter.sh/discovery: "ase-eks-cluster" 
   securityGroupSelectorTerms:
     - tags:
-        karpenter.sh/discovery: "ase-eks-cluster" # replace with your cluster name
+        karpenter.sh/discovery: "ase-eks-cluster" 
 
 
 
