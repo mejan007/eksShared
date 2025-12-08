@@ -107,3 +107,15 @@ resource "aws_security_group_rule" "controlplane_to_worker_extensions" {
   source_security_group_id = module.eks.cluster_security_group_id
   depends_on               = [aws_security_group.eks_worker_node_sg, module.eks]
 }
+
+# Allow control plane to reach worker nodes for webhooks (ALB controller, etc)
+resource "aws_security_group_rule" "controlplane_to_worker_webhooks" {
+  description              = "Allow control plane to worker nodes for admission webhooks"
+  type                     = "ingress"
+  from_port                = 9443
+  to_port                  = 9443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_worker_node_sg.id
+  source_security_group_id = module.eks.cluster_security_group_id
+  depends_on               = [aws_security_group.eks_worker_node_sg, module.eks]
+}
