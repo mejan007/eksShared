@@ -81,7 +81,7 @@ resource "helm_release" "helmCilium" {
 
   set {
     name  = "gatewayAPI.enabled"
-    value = "false"
+    value = "false"  # if true cilium will install NLB since it manages the gateway api controller itself
   }
 
   # kube-proxy replacement (commented out like original)
