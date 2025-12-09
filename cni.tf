@@ -117,6 +117,7 @@ resource "helm_release" "helmCilium" {
   }
 
   # masquerading, hostNetworking (kept commented exactly)
+  # replace pod private ip with node and load ip 
   set {
     name  = "bpf.masquerade"
     value = "true"
