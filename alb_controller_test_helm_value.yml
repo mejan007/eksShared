@@ -150,7 +150,7 @@ cluster:
 
 # The ingress class this controller will satisfy. If not specified, controller will match all
 # ingresses without ingress class annotation and ingresses of type alb
-ingressClass: alb
+ingressClass: alb 
 
 # ingressClassParams specify the IngressCLassParams that enforce settings for a set of Ingresses when using with ingress Controller.
 ingressClassParams:
@@ -386,6 +386,7 @@ controllerConfig:
   # featureGates set of key: value pairs that describe AWS load balance controller features
   featureGates:  
     ALBGatewayAPI: true 
+    # NLBGatewayAPI: true 
   extraArgs:
     webhook-serve-address: "0.0.0.0"
     # ALBSingleSubnet: false

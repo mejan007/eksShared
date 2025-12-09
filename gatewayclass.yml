@@ -3,7 +3,7 @@ kind: GatewayClass
 metadata:
   name: aws-alb
   
-  ## Donot work but the logic is write just need to include that in the spec.parametersRef not 
+  ## Donot work but the logic is  same as write just need to include that in the spec.parametersRef not 
   ## in annotationos.
 
   # annotations:
@@ -97,13 +97,13 @@ kind: Service
 metadata:
   name: service
 spec:
-  type: NodePort   
+  type: ClusterIP
   selector:
     app: myapp
   ports:
   - port: 80
     targetPort: 80 
-    nodePort: 30080  
+    # nodePort: 30070 
 --- 
 
 apiVersion: apps/v1
@@ -119,13 +119,13 @@ spec:
       labels:
         app: myapp
     spec:
+      replicas: 3 
       containers:
       - name: myapp
         image: nginx:latest
         
         ports:
         - containerPort: 80
-
 
 
 
@@ -145,6 +145,7 @@ spec:
     kind: Service
     group: ""        # core/v1
   defaultConfiguration:
-    targetType: instance
+    # port: 80
+    targetType: ip
     protocol: HTTP
     ipAddressType: ipv4
