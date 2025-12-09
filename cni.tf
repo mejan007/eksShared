@@ -49,10 +49,10 @@ resource "helm_release" "helmCilium" {
     value = "true"
   }
 
-  # set {
-  #   name  = "ipam.mode"
-  #   value = "cluster-pool"
-  # }
+  set {
+    name  = "ipam.mode"
+    value = "eni"
+  }
 
   set {
     name  = "data_path"
