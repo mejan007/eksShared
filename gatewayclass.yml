@@ -97,13 +97,13 @@ kind: Service
 metadata:
   name: service
 spec:
-  type: NodePort   
+  type: ClusterIP
   selector:
     app: myapp
   ports:
   - port: 80
     targetPort: 80 
-    nodePort: 30080  
+    # nodePort: 30080  
 --- 
 
 apiVersion: apps/v1
@@ -145,6 +145,6 @@ spec:
     kind: Service
     group: ""        # core/v1
   defaultConfiguration:
-    targetType: instance
+    targetType: ip
     protocol: HTTP
     ipAddressType: ipv4
