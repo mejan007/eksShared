@@ -84,6 +84,17 @@ resource "aws_security_group_rule" "worker_to_controlplane" {
   source_security_group_id = aws_security_group.eks_worker_node_sg.id
   depends_on               = [aws_security_group.eks_worker_node_sg, module.eks]
 }
+# Allow worker nodes to communicate with control plane webhooks
+resource "aws_security_group_rule" "worker_to_controlplane_webhooks" {
+  description              = "Allow worker nodes to communicate with control plane webhooks"
+  type                     = "ingress"
+  from_port                = 9443
+  to_port                  = 9443
+  protocol                 = "tcp"
+  security_group_id        = module.eks.cluster_security_group_id
+  source_security_group_id = aws_security_group.eks_worker_node_sg.id
+  depends_on               = [aws_security_group.eks_worker_node_sg, module.eks]
+}
 
 # Allow control plane to communicate with worker nodes (kubelet)
 resource "aws_security_group_rule" "controlplane_to_worker" {
