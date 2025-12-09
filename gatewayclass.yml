@@ -98,7 +98,7 @@ metadata:
   name: service
 spec:
   type: ClusterIP
-  type: ClusterIP
+
   selector:
     app: myapp
   ports:

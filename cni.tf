@@ -42,37 +42,37 @@ resource "helm_release" "helmCilium" {
   chart      = "cilium"
   namespace  = "kube-system"
 
-  version = "1.14.5"
+  version = "1.18.4"
 
   set {
     name  = "eni.enabled"
-    value = "true"
+    value = "false"
   }
 
   set {
     name  = "ipam.mode"
-    value = "eni"
+    value = "cluster-pool"
   }
 
   set {
     name  = "data_path"
-    value = "aws-vpc"
+    value = "tunnel"
   }
 
-  # set {
-  #   name  = "tunnel"
-  #   value = "vxlan"
-  # }
+  set {
+    name  = "tunnel"
+    value = "vxlan"
+  }
 
-  # set {
-  #   name  = "ipam.operator.clusterPoolIPv4PodCIDRList[0]"
-  #   value = "172.20.0.0/16"
-  # }
+  set {
+    name  = "ipam.operator.clusterPoolIPv4PodCIDRList[0]"
+    value = "11.21.0.0/16"
+  }
 
-  # set {
-  #   name  = "ipam.operator.clusterPoolIPv4MaskSize"
-  #   value = "24"
-  # }
+  set {
+    name  = "ipam.operator.clusterPoolIPv4MaskSize"
+    value = "24"
+  }
 
   set {
     name  = "policy.enabled"
@@ -122,10 +122,10 @@ resource "helm_release" "helmCilium" {
     value = "true"
   }
 
-#   set {
-#     name  = "hostNetworking"
-#     value = "true"
-#   }
+  set {
+    name  = "hostNetworking"
+    value = "true"
+  }
 
   wait = true
 }
