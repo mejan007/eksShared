@@ -46,33 +46,33 @@ resource "helm_release" "helmCilium" {
 
   set {
     name  = "eni.enabled"
-    value = "false"
+    value = "true"
   }
 
   set {
     name  = "ipam.mode"
-    value = "cluster-pool"
+    value = "eni"
   }
 
   set {
     name  = "data_path"
-    value = "tunnel"
+    value = "aws-vpc"
   }
 
-  set {
-    name  = "tunnel"
-    value = "vxlan"
-  }
+  # set {
+  #   name  = "tunnel"
+  #   value = "vxlan"
+  # }
 
-  set {
-    name  = "ipam.operator.clusterPoolIPv4PodCIDRList[0]"
-    value = "172.20.0.0/16"
-  }
+  # set {
+  #   name  = "ipam.operator.clusterPoolIPv4PodCIDRList[0]"
+  #   value = "172.20.0.0/16"
+  # }
 
-  set {
-    name  = "ipam.operator.clusterPoolIPv4MaskSize"
-    value = "24"
-  }
+  # set {
+  #   name  = "ipam.operator.clusterPoolIPv4MaskSize"
+  #   value = "24"
+  # }
 
   set {
     name  = "policy.enabled"
@@ -87,7 +87,7 @@ resource "helm_release" "helmCilium" {
   # kube-proxy replacement (commented out like original)
   set {
     name  = "kubeProxyReplacement"
-    value = "false"
+    value = "true"
   }
 
   set {

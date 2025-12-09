@@ -45,13 +45,14 @@ resource "aws_security_group" "eks_worker_node_sg" {
   description = "Security group for EKS worker nodes"
   vpc_id      = module.vpc.vpc_id
 
+# Not 
   # ingress {
-  #   description = "Allow bastion to access worker nodes"
-  #   from_port   = 443
-  #   to_port     = 443
+  #   description = "Allow NodePort traffic"
+  #   from_port   = 30000
+  #   to_port     = 32767
   #   protocol    = "tcp"
   #   cidr_blocks = ["10.0.0.0/16"]
-  # }
+  # } 
 
   egress {
     from_port   = 0
@@ -78,6 +79,17 @@ resource "aws_security_group_rule" "worker_to_controlplane" {
   type                     = "ingress"
   from_port                = 443
   to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.eks.cluster_security_group_id
+  source_security_group_id = aws_security_group.eks_worker_node_sg.id
+  depends_on               = [aws_security_group.eks_worker_node_sg, module.eks]
+}
+# Allow worker nodes to communicate with control plane webhooks
+resource "aws_security_group_rule" "worker_to_controlplane_webhooks" {
+  description              = "Allow worker nodes to communicate with control plane webhooks"
+  type                     = "ingress"
+  from_port                = 9443
+  to_port                  = 9443
   protocol                 = "tcp"
   security_group_id        = module.eks.cluster_security_group_id
   source_security_group_id = aws_security_group.eks_worker_node_sg.id
