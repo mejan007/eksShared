@@ -55,11 +55,11 @@ resource "helm_release" "helmCilium" {
     # value = "cluster-pool"                     # Use cluster-pool IPAM mode
   }
 
-  set {
-    name  = "data_path"
-    # value = "tunnel" # overlay mode
-    value = "aws-vpc"
-  }
+  # set {
+  #   name  = "data_path"
+  #   # value = "tunnel" # overlay mode
+  #   value = "aws-vpc"
+  # }
 
   # set {
   #   name  = "tunnel"
