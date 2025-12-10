@@ -46,12 +46,13 @@ resource "helm_release" "helmCilium" {
 
   set {
     name  = "eni.enabled"
-    value = "false"
+    value = "true"
   }
 
   set {
     name  = "ipam.mode"
-    value = "cluster-pool"
+    # value = "cluster-pool"
+    value = "eni"
   }
 
   set {
