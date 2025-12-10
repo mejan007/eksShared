@@ -55,7 +55,7 @@ resource "helm_release" "helmCilium" {
     # value = "cluster-pool"                     # Use cluster-pool IPAM mode
   }
   # IN v 1.18.4 routingMode must be set to native when using eni mode 
-  set ={ 
+  set { 
     name = "routingMode"
     value = "native"
   } 
