@@ -46,33 +46,35 @@ resource "helm_release" "helmCilium" {
 
   set {
     name  = "eni.enabled"
-    value = "false"
+    value = "true"
   }
 
   set {
     name  = "ipam.mode"
-    value = "cluster-pool"
+    value = "eni"
+    # value = "cluster-pool"                     # Use cluster-pool IPAM mode
   }
 
   set {
     name  = "data_path"
-    value = "tunnel"
+    # value = "tunnel" # overlay mode
+    value = "aws-vpc"
   }
 
-  set {
-    name  = "tunnel"
-    value = "vxlan"
-  }
+  # set {
+  #   name  = "tunnel"
+  #   value = "vxlan"
+  # }
 
-  set {
-    name  = "ipam.operator.clusterPoolIPv4PodCIDRList[0]"
-    value = "11.21.0.0/16"
-  }
+  # set {
+  #   name  = "ipam.operator.clusterPoolIPv4PodCIDRList[0]"
+  #   value = "11.21.0.0/16"
+  # }
 
-  set {
-    name  = "ipam.operator.clusterPoolIPv4MaskSize"
-    value = "24"
-  }
+  # set {
+  #   name  = "ipam.operator.clusterPoolIPv4MaskSize"
+  #   value = "24"
+  # }
 
   set {
     name  = "policy.enabled"
@@ -81,7 +83,7 @@ resource "helm_release" "helmCilium" {
 
   set {
     name  = "gatewayAPI.enabled"
-    value = "false"  # if true cilium will install NLB since it manages the gateway api controller itself
+    value = "true"  # if true cilium will install NLB since it manages the gateway api controller itself
   }
 
   # kube-proxy replacement (commented out like original)
