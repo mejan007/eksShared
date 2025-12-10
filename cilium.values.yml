@@ -1096,7 +1096,7 @@ k8sNetworkPolicy:
 endpointLockdownOnMapOverflow: false
 eni:
   # -- Enable Elastic Network Interface (ENI) integration.
-  enabled: false
+  enabled: true
   # -- Release IPs not used from the ENI
   awsReleaseExcessIPs: false
   # -- Enable ENI prefix delegation
@@ -1994,7 +1994,7 @@ installNoConntrackIptablesRules: false
 ipam:
   # -- Configure IP Address Management mode.
   # ref: https://docs.cilium.io/en/stable/network/concepts/ipam/
-  mode: "cluster-pool"
+  mode: "eni"
   # -- Maximum rate at which the CiliumNode custom resource is updated.
   ciliumNodeUpdateRate: "15s"
   # -- Pre-allocation settings for IPAM in Multi-Pool mode
@@ -2006,16 +2006,16 @@ ipam:
     # type: [array, string]
     # @schema
     # -- IPv4 CIDR list range to delegate to individual nodes for IPAM.
-    clusterPoolIPv4PodCIDRList: ["11.21.0.0/8"]
+    # clusterPoolIPv4PodCIDRList: ["11.21.0.0/8"] #check
     # -- IPv4 CIDR mask size to delegate to individual nodes for IPAM.
-    clusterPoolIPv4MaskSize: 24
+    # clusterPoolIPv4MaskSize: 24 
     # @schema
     # type: [array, string]
     # @schema
     # -- IPv6 CIDR list range to delegate to individual nodes for IPAM.
-    clusterPoolIPv6PodCIDRList: ["fd00::/104"] 
+    # clusterPoolIPv6PodCIDRList: ["fd00::/104"]
     # -- IPv6 CIDR mask size to delegate to individual nodes for IPAM.
-    clusterPoolIPv6MaskSize: 120 
+    # clusterPoolIPv6MaskSize: 120
     # -- IP pools to auto-create in multi-pool IPAM mode.
     autoCreateCiliumPodIPPools: {}
     #   default:
@@ -2114,7 +2114,7 @@ readinessProbe:
 # @schema@
 # type: [string, boolean]
 # @schema@
-kubeProxyReplacement: "true"
+kubeProxyReplacement: "true" # Check
 # -- healthz server bind address for the kube-proxy replacement.
 # To enable set the value to '0.0.0.0:10256' for all ipv4
 # addresses and this '[::]:10256' for all ipv6 addresses.
@@ -2161,7 +2161,7 @@ maglev: {}
 # @default -- `true` unless ipam eni mode is active 
 enableIPv4Masquerade: ~
 # -- Enables masquerading of IPv6 traffic leaving the node from endpoints.
-enableIPv6Masquerade: true
+enableIPv6Masquerade: false
 # -- Enables masquerading to the source of the route for traffic leaving the node from endpoints.
 enableMasqueradeRouteSource: false
 # -- Enables IPv4 BIG TCP support which increases maximum IPv4 GSO/GRO limits for nodes and pods
@@ -2802,10 +2802,10 @@ underlayProtocol: ""
 #   - native
 #   - tunnel
 # @default -- `"tunnel"`
-routingMode: "" #check
+routingMode: "eni" #check eni->for eni mode and tunnel for vxlan
 # -- Configure VXLAN and Geneve tunnel port.
 # @default -- Port 8472 for VXLAN, Port 6081 for Geneve
-tunnelPort: 8472
+# tunnelPort: 8472 #check
 # -- Configure VXLAN and Geneve tunnel source port range hint.
 # @default -- 0-0 to let the kernel driver decide the range
 tunnelSourcePortRange: 0-0
@@ -2928,7 +2928,7 @@ operator:
   # -- Annotations to be added to all top-level cilium-operator objects (resources under templates/cilium-operator)
   annotations: {}
   # -- HostNetwork setting
-  hostNetwork: true
+  hostNetwork: true #check
   # -- Security context to be added to cilium-operator pods
   podSecurityContext:
     seccompProfile:
