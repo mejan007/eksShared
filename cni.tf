@@ -1,5 +1,3 @@
-
-
 # Install Cilium using the Cilium Terraform provider
 # resource "cilium" "overlay" {
 # #   name     = "cilium"
@@ -132,6 +130,17 @@ resource "helm_release" "helmCilium" {
   set {
     name  = "bpf.masquerade"
     value = "true"
+  }
+
+# In version 1.18.4 these settings have changed to enableIPv4Masquerade and enableIPv6Masquerade
+  set {
+    name  = "enableIPv4Masquerade"
+    value = "true"
+  }
+
+  set {
+    name  = "enableIPv6Masquerade"
+    value = "false"  # Set to true if using IPv6
   }
 
   set {
