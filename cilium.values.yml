@@ -2124,7 +2124,7 @@ l2NeighDiscovery:
   # -- Enable L2 neighbor discovery in the agent
   enabled: false
 # -- Enable Layer 7 network policy.
-l7Proxy: true
+l7Proxy: true #check create the cilium envoy.
 # -- Enable Local Redirect Policy (deprecated, please use 'localRedirectPolicies.enabled' instead)
 localRedirectPolicy: false
 localRedirectPolicies:

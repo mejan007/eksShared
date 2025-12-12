@@ -158,11 +158,7 @@ spec:
         ports:
         - containerPort: 80
 
-
-
-
 --- 
-
 
 
 apiVersion: gateway.k8s.aws/v1beta1

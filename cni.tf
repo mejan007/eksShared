@@ -34,6 +34,10 @@
 #   wait = true
 # }
 
+
+
+
+
 resource "helm_release" "helmCilium" {
   name       = "cilium"
   repository = "https://helm.cilium.io/"
@@ -91,6 +95,7 @@ resource "helm_release" "helmCilium" {
   set {
     name  = "gatewayAPI.enabled"
     value = "true"  # if true cilium will install NLB since it manages the gateway api controller itself
+    # Create the Cilium Envoy Pod ( >= 1.14.0 )
   }
 
   # kube-proxy replacement (commented out like original)
